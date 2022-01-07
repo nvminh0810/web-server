@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/auth", authRoute);
-app.use("/users", verifyToken, userRoute);
+app.use("/users", userRoute);
 app.use("/posts", verifyToken, postRoute);
 app.use("/conservations", verifyToken, conservationRoute);
 app.use("/messages", verifyToken, messageRoute);
