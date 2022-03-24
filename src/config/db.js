@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.DB_URI, {
+    const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT } = process.env;
+    const uri = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}`;
+    await mongoose.connect(uri, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     });

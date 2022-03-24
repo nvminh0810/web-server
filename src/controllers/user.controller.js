@@ -3,7 +3,13 @@ const { toObjectId } = require("../utils/types.util");
 
 const getUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const { name } = req.query;
+    let users = [];
+    if (name) {
+      users = await User.find({ name: { $regex: ".*" + name + ".*" } });
+    } else {
+      users = await User.find({});
+    }
     res.status(200).json({
       data: users,
     });
@@ -15,16 +21,9 @@ const getUsers = async (req, res, next) => {
 const findUserInfo = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    console.log(userId);
     const user = await User.aggregate([
       { $match: { _id: toObjectId(userId) } },
-      {
-        $lookup: {
-          from: "posts",
-          localField: "_id",
-          foreignField: "idUser",
-          as: "posts",
-        },
-      },
       {
         $lookup: {
           from: "groups",
@@ -33,7 +32,17 @@ const findUserInfo = async (req, res, next) => {
           as: "groups",
         },
       },
-      { $unset: ["posts.idUser", "groups.members"] },
+      {
+        $unset: ["groups.members", "password"],
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "owner",
+          as: "posts",
+        },
+      },
     ]);
     res.status(200).json({
       data: user,

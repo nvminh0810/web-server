@@ -1,4 +1,5 @@
 const Group = require("../models/group.model");
+const { toObjectId } = require("../utils/types.util");
 
 const getGroups = async (req, res, next) => {
   try {
@@ -14,7 +15,18 @@ const getGroups = async (req, res, next) => {
 const getGroupById = async (req, res, next) => {
   try {
     const { groupId } = req.params;
-    const group = await Group.findById(groupId);
+    const group = await Group.aggregate([
+      { $match: { _id: toObjectId(groupId) } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "members",
+          foreignField: "_id",
+          as: "members",
+        },
+      },
+      { $unset: ["members.groups", "members.password"] },
+    ]);
     res.status(200).json({
       data: group,
     });

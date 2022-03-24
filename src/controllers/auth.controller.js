@@ -5,13 +5,10 @@ const { throwError } = require("../utils/error.util");
 
 const registerController = async (req, res, next) => {
   try {
-    const user = await User.create(req.body);
+    let user = await User.create(req.body);
     const accessToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
     res.status(200).json({
-      data: {
-        accessToken,
-        user,
-      },
+      data: user,
     });
   } catch (error) {
     next(error);

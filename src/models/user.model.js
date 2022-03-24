@@ -9,7 +9,15 @@ const userSchema = new Schema(
     name: String,
     groups: [mongoose.SchemaTypes.ObjectId],
   },
-  { versionKey: false }
+  {
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.password;
+        delete ret.__v;
+      },
+    },
+    timestamps: true,
+  }
 );
 
 userSchema.pre("save", function (next) {

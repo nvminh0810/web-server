@@ -3,11 +3,19 @@ const { Schema } = mongoose;
 
 const postSchema = new Schema(
   {
-    idUser: mongoose.SchemaTypes.ObjectId,
+    owner: mongoose.SchemaTypes.ObjectId,
     title: String,
     content: String,
   },
-  { versionKey: false }
+  {
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.password;
+        delete ret.__v;
+      },
+    },
+    timestamps: true,
+  }
 );
 
 module.exports = mongoose.model("Post", postSchema);
